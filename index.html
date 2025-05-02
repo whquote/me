@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile</title>
+  <meta name="description" content="wildan hidayat">
+  <meta property="og:title" content="Profile">
+  <meta property="og:description" content="wildan hidayat">
+  <meta property="og:image" content="https://raw.githubusercontent.com/whquote/me/main/default.jpg">
+  <meta property="og:url" content="https://github.com/whquote">
+  <meta property="og:type" content="website">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .profile {
+      background: white;
+      max-width: 400px;
+      margin: auto;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 30px 20px;
+    }
+    .profile img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 4px solid #4CAF50;
+    }
+    .profile h2 {
+      margin: 10px 0 5px;
+    }
+    .profile p {
+      color: gray;
+      font-size: 14px;
+    }
+    .link-list {
+      max-height: 250px; /* Atur tinggi maksimal container */
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .link-list a {
+      display: block;
+      margin: 10px auto;
+      padding: 12px;
+      width: 80%;
+      background: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    .link-list a:hover {
+      background: #45a049;
+    }
 
+    /* Tambahan: scrollbar lebih halus di perangkat modern */
+    .link-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .link-list::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="profile">
+    <img src="https://raw.githubusercontent.com/whquote/me/main/default.jpg" alt="Foto Profil">
+    <h2>Wildan Hidayat</h2>
+    <p>whquote</p>
+
+    <div class="link-list">
+      <!-- Tambah sebanyak yang kamu mau -->
+      <a href="https://whquote.github.io/me/one/" target="_blank">Quote Indah</a>
+      <a href="https://whquote.github.io/me/two/" target="_blank">Quote Bijak</a>
+      <a href="https://whquote.github.io/me/three/" target="_blank">Quote Harian</a>
+      <a href="https://whquote.github.io/me/four/" target="_blank">Quote Motivasi</a>
+      <a href="https://whquote.github.io/me/five/" target="_blank">Quote Cinta</a>
+      <a href="https://whquote.github.io/me/six/" target="_blank">Kehidupan</a>
+      <a href="#" target="_blank">Link 7</a>
+      <a href="#" target="_blank">Link 8</a>
+      <a href="#" target="_blank">Link 9</a>
+      <a href="#" target="_blank">Link 10</a>
+      <a href="#" target="_blank">Link 11</a>
+      <a href="#" target="_blank">Link 12</a>
+    </div>
+  </div>
+
+</body>
+</html>

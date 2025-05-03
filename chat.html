@@ -1,200 +1,221 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chat Admin & Member</title>
+  <title>Chat WA Style</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-  body {
-    font-family: 'sans-serif', cursive, Comic Sans MS;
-    max-width: 98%;
-    margin: auto;
-    background: #fff0f5;
-    color: #333;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
-  }
-
-  h2 {
-    text-align: center;
-    color: #e75480;
-    margin-bottom: 20px;
-  }
-
-  input, button {
-    font-family: inherit;
-    padding: 4%;
-    margin: 5px 0;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 8px;
-    border: 1px solid #e75480;
-  }
-
-  input:focus {
-    outline: none;
-    border-color: #ff69b4;
-    box-shadow: 0 0 5px #ffb6c1;
-  }
-
-  button {
-    background-color: #e75480;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  button:hover {
-    background-color: #ff69b4;
-  }
-
-  #messages {
-    overflow-y: auto;
-    max-height: 70vh;
-  }
-  
-  #messages > div {
-    background: #ffe4e1;
-    border-radius: 10px;
-    padding: 8px 12px;
-    margin: 6px 0;
-    border-left: 5px solid #ff69b4;
-    overflow-x: auto;
-    font-size: 2em;
-  }
-
-  .username {
-    font-weight: bold;
-    color: #d6336c;
-  }
-
-  .date {
-    font-size: 10px;
-    color: gray;
-  }
-
-  .delete-btn {
-    float: right;
-    color: #ff0000;
-    cursor: pointer;
-    font-size: 12px;
-  }
-</style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ece5dd;
+    }
+    #app {
+      max-width: 600px;
+      margin: auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff;
+      border: 1px solid #ccc;
+    }
+    #loginArea {
+      margin: auto;
+      text-align: center;
+      padding: 20px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 10px;
+      border: none;
+      width: 45vw;
+      font-size: 16px;
+    }
+    #chatUI {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background-color: #e5ddd5;
+    }
+    .bubble {
+      background-color: #dcf8c6;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 5px 0;
+      max-width: 80%;
+      position: relative;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .me {
+      background-color: #cfe9ba;
+      margin-left: auto;
+      overflow-x: auto;
+    }
+    .meta {
+      font-size: 10px;
+      color: #555;
+      margin-top: 5px;
+      overflow-x: auto;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 8px;
+      font-size: 12px;
+      color: red;
+      cursor: pointer;
+    }
+    #controls {
+      display: flex;
+      padding: 10px;
+      background: #eee;
+    }
+    #text {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    #send, #logout {
+      margin-left: 5px;
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: none;
+      background-color: #25d366;
+      color: white;
+      cursor: pointer;
+    }
+    #logout {
+      background-color: #d62828;
+    }
+  </style>
 </head>
 <body>
-
-  <h2>WHQuote Chat</h2>
-  <input id="user" placeholder="Username (max 8)" maxlength="8" />
-<input id="pin" placeholder="PIN (max 8)" maxlength="8" type="password" />
-<button id="login">Login</button>
-<button id="logout" style="display:none">Logout</button>
-
-<div id="chatUI" style="display:none">
-<div id="messages"></div>
-<input id="text" placeholder="Tulis pesan (max 50)" maxlength="50" />
-<button id="send">Kirim</button>
+<div id="app">
+  <div id="loginArea">
+    <h2>Masuk Chat</h2>
+    <input id="user" placeholder="Nama (max 8)" maxlength="8"><br>
+    <input id="pin" type="password" placeholder="PIN (max 8)" maxlength="8"><br>
+    <button id="login">Masuk</button>
+  </div>
+  <div id="chatUI" style="display:none;">
+    <div id="messages"></div>
+    <div id="controls">
+      <button id="logout">Keluar</button>
+      <input id="text" placeholder="Ketik pesan..." maxlength="50">
+      <button id="send">Kirim</button>
+    </div>
+  </div>
 </div>
 
 <script>
-const firebaseConfig = {
-apiKey: "AIzaSyBri3Z2f_fK1XLSGDaO83Fe6qKkvNsnuhA",
-authDomain: "whquote-121fb.firebaseapp.com",
-projectId: "whquote-121fb"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const chatRef = db.collection("chat");
-const usersRef = db.collection("users");
+  const firebaseConfig = {
+    apiKey: "AIzaSyBri3Z2f_fK1XLSGDaO83Fe6qKkvNsnuhA",
+    authDomain: "whquote-121fb.firebaseapp.com",
+    projectId: "whquote-121fb"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const chatRef = db.collection("chat");
+  const usersRef = db.collection("users");
 
-let currentUser = "", isAdmin = false;
+  let currentUser = "", isAdmin = false, currentUserDocId = "";
+  const $ = id => document.getElementById(id);
 
-window.onload = async () => {
-const savedUser = localStorage.getItem("username");
-const savedPin = localStorage.getItem("pin");
-if (savedUser && savedPin) {
-user.value = savedUser;
-pin.value = savedPin;
-await login(savedUser, savedPin);
-}
-};
+  let allMessages = [];
 
-document.getElementById("login").onclick = async () => {
-const username = user.value.trim().toLowerCase();
-const pinCode = pin.value.trim().toLowerCase();
+  window.onload = async () => {
+    const savedUser = localStorage.getItem("username");
+    const savedPin = localStorage.getItem("pin");
+    if (savedUser && savedPin) {
+      $("user").value = savedUser;
+      $("pin").value = savedPin;
+      await login(savedUser, savedPin);
+    }
+  };
 
-if (!username || !pinCode) return alert("Isi semua kolom!");
-if (username.length > 8 || pinCode.length > 8) return alert("Username dan PIN maksimal 8 karakter");
+  $("login").onclick = async () => {
+    const username = $("user").value.trim().toLowerCase();
+    const pin = $("pin").value.trim().toLowerCase();
+    if (!username || !pin) return alert("Isi semua kolom!");
+    if (username.length > 8 || pin.length > 8) return alert("Maks 8 karakter");
+    await login(username, pin);
+  };
 
-await login(username, pinCode);
-};
+  $("logout").onclick = () => {
+    localStorage.clear();
+    location.reload();
+  };
 
-document.getElementById("logout").onclick = () => {
-localStorage.clear();
-location.reload();
-};
+  async function login(username, pin) {
+    const snap = await usersRef.where("username", "==", username).get();
+    if (!snap.empty) {
+      const doc = snap.docs[0];
+      const data = doc.data();
+      if (data.pin !== pin) return alert("PIN salah!");
+      isAdmin = data.isAdmin;
+      currentUserDocId = doc.id;
+    } else {
+      isAdmin = pin === "e8k9fb29";
+      const newDoc = await usersRef.add({ username, pin, isAdmin });
+      currentUserDocId = newDoc.id;
+    }
 
-async function login(username, pinCode) {
-const snap = await usersRef.where("username", "==", username).get();
+    currentUser = username;
+    localStorage.setItem("username", username);
+    localStorage.setItem("pin", pin);
 
-if (!snap.empty) {
-const data = snap.docs[0].data();
-if (data.pin !== pinCode) return alert("PIN salah!");
-isAdmin = data.isAdmin;
-} else {
-const existing = await usersRef.where("username", "==", username).get();
-if (!existing.empty) return alert("Nama sudah dipakai!");
-isAdmin = pinCode === "e8k9fb29";
-await usersRef.add({
-username, pin: pinCode, isAdmin
-});
-}
+    $("loginArea").style.display = "none";
+    $("chatUI").style.display = "flex";
 
-currentUser = username;
-localStorage.setItem("username", username);
-localStorage.setItem("pin", pinCode);
+    chatRef.orderBy("time").onSnapshot(snap => {
+      allMessages = [];
+      snap.forEach(doc => {
+        allMessages.push({ id: doc.id, ...doc.data() });
+      });
+      renderMessages();
+    });
+  }
 
-document.getElementById("chatUI").style.display = "block";
-document.getElementById("logout").style.display = "inline";
-user.disabled = true;
-pin.disabled = true;
-login.disabled = true;
+  $("send").onclick = () => {
+    const msg = $("text").value.trim();
+    if (!msg) return;
+    chatRef.add({ username: currentUser, text: msg, time: Date.now() });
+    $("text").value = "";
+  };
 
-chatRef.orderBy("time").onSnapshot(snap => {
-messages.innerHTML = "";
-snap.forEach(doc => {
-const data = doc.data();
-const div = document.createElement("div");
-div.innerHTML = `
-<div class="username">${data.username} <span class="date">${new Date(data.time).toLocaleString()}</span>
-${isAdmin ? `<span class="delete-btn" onclick="deleteMsg('${doc.id}')">Hapus</span>`: ""}
-</div>
-<div class="text">${data.text}</div>
-`;
-messages.appendChild(div);
-});
-messages.scrollTop = messages.scrollHeight;
-});
-}
+  function deleteMsg(id) {
+    //if (confirm("Yakin ingin menghapus pesan ini?")) {
+      chatRef.doc(id).delete();
+    //}
+  }
 
-send.onclick = () => {
-const msg = text.value.trim().toLowerCase();
-if (!msg) return;
-if (msg.length > 50) return alert("Pesan maksimal 50 karakter");
-
-chatRef.add({
-username: currentUser, text: msg, time: Date.now()
-});
-text.value = "";
-};
-
-async function deleteMsg(id) {
-//if (confirm("Hapus pesan ini?")) {
-await chatRef.doc(id).delete();
-//}
-}
+  function renderMessages() {
+    $("messages").innerHTML = "";
+    allMessages.forEach(data => {
+      const div = document.createElement("div");
+      div.className = "bubble" + (data.username === currentUser ? " me" : "");
+      div.innerHTML = `
+        ${data.text}
+        <div class="meta">
+          ${data.username} - ${new Date(data.time).toLocaleTimeString()}
+          ${isAdmin ? `<span class="delete-btn" onclick="deleteMsg('${data.id}')">x</span>` : ""}
+        </div>
+      `;
+      $("messages").appendChild(div);
+    });
+    $("messages").scrollTop = $("messages").scrollHeight;
+  }
 </script>
-
 </body>
 </html>

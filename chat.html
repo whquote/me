@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Admin & Member</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <style>
+  body {
+    font-family: 'sans-serif', cursive, Comic Sans MS;
+    max-width: 98%;
+    margin: auto;
+    background: #fff0f5;
+    color: #333;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
+  }
+
+  h2 {
+    text-align: center;
+    color: #e75480;
+    margin-bottom: 20px;
+  }
+
+  input, button {
+    font-family: inherit;
+    padding: 10px;
+    margin: 5px 0;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid #e75480;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #ff69b4;
+    box-shadow: 0 0 5px #ffb6c1;
+  }
+
+  button {
+    background-color: #e75480;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background-color: #ff69b4;
+  }
+
+  #messages {
+    overflow-y: auto;
+    max-height: 70vh;
+  }
+  
+  #messages > div {
+    background: #ffe4e1;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin: 6px 0;
+    border-left: 5px solid #ff69b4;
+    overflow-x: auto;
+  }
+
+  .username {
+    font-weight: bold;
+    color: #d6336c;
+  }
+
+  .date {
+    font-size: 10px;
+    color: gray;
+  }
+
+  .delete-btn {
+    float: right;
+    color: #ff0000;
+    cursor: pointer;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+  <h2>WHQuote Chat</h2>
+  <input id="user" placeholder="Username (max 8)" maxlength="8" />
+<input id="pin" placeholder="PIN (max 8)" maxlength="8" type="password" />
+<button id="login">Login</button>
+<button id="logout" style="display:none">Logout</button>
+
+<div id="chatUI" style="display:none">
+<div id="messages"></div>
+<input id="text" placeholder="Tulis pesan (max 50)" maxlength="50" />
+<button id="send">Kirim</button>
+</div>
+
+<script>
+const firebaseConfig = {
+apiKey: "AIzaSyBri3Z2f_fK1XLSGDaO83Fe6qKkvNsnuhA",
+authDomain: "whquote-121fb.firebaseapp.com",
+projectId: "whquote-121fb"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const chatRef = db.collection("chat");
+const usersRef = db.collection("users");
+
+let currentUser = "", isAdmin = false;
+
+window.onload = async () => {
+const savedUser = localStorage.getItem("username");
+const savedPin = localStorage.getItem("pin");
+if (savedUser && savedPin) {
+user.value = savedUser;
+pin.value = savedPin;
+await login(savedUser, savedPin);
+}
+};
+
+document.getElementById("login").onclick = async () => {
+const username = user.value.trim().toLowerCase();
+const pinCode = pin.value.trim().toLowerCase();
+
+if (!username || !pinCode) return alert("Isi semua kolom!");
+if (username.length > 8 || pinCode.length > 8) return alert("Username dan PIN maksimal 8 karakter");
+
+await login(username, pinCode);
+};
+
+document.getElementById("logout").onclick = () => {
+localStorage.clear();
+location.reload();
+};
+
+async function login(username, pinCode) {
+const snap = await usersRef.where("username", "==", username).get();
+
+if (!snap.empty) {
+const data = snap.docs[0].data();
+if (data.pin !== pinCode) return alert("PIN salah!");
+isAdmin = data.isAdmin;
+} else {
+const existing = await usersRef.where("username", "==", username).get();
+if (!existing.empty) return alert("Nama sudah dipakai!");
+isAdmin = pinCode === "e8k9fb29";
+await usersRef.add({
+username, pin: pinCode, isAdmin
+});
+}
+
+currentUser = username;
+localStorage.setItem("username", username);
+localStorage.setItem("pin", pinCode);
+
+document.getElementById("chatUI").style.display = "block";
+document.getElementById("logout").style.display = "inline";
+user.disabled = true;
+pin.disabled = true;
+login.disabled = true;
+
+chatRef.orderBy("time").onSnapshot(snap => {
+messages.innerHTML = "";
+snap.forEach(doc => {
+const data = doc.data();
+const div = document.createElement("div");
+div.innerHTML = `
+<div class="username">${data.username} <span class="date">${new Date(data.time).toLocaleString()}</span>
+${isAdmin ? `<span class="delete-btn" onclick="deleteMsg('${doc.id}')">Hapus</span>`: ""}
+</div>
+<div class="text">${data.text}</div>
+`;
+messages.appendChild(div);
+});
+messages.scrollTop = messages.scrollHeight;
+});
+}
+
+send.onclick = () => {
+const msg = text.value.trim().toLowerCase();
+if (!msg) return;
+if (msg.length > 50) return alert("Pesan maksimal 50 karakter");
+
+chatRef.add({
+username: currentUser, text: msg, time: Date.now()
+});
+text.value = "";
+};
+
+async function deleteMsg(id) {
+//if (confirm("Hapus pesan ini?")) {
+await chatRef.doc(id).delete();
+//}
+}
+</script>
+
+</body>
+</html>

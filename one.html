@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Video Background dengan Musik</title>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: Arial, sans-serif;
+}
+body, html {
+width: 100%;
+height: 100%;
+overflow: hidden;
+}
+.video-background {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+object-fit: cover;
+z-index: -1;
+display: none;
+}
+.overlay {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.2);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+color: white;
+text-align: center;
+padding: 20px;
+display: none;
+}
+.text {
+font-size: 1.2rem;
+opacity: 0;
+text-shadow: 0px 0px 5px rgba(0,0,0,0.8);
+animation: fadeIn 2s forwards;
+}
+#text1 {
+animation-delay: 0s;
+}
+#text2 {
+animation-delay: 2s;
+}
+#text3 {
+animation-delay: 4s;
+}
+#text4 {
+animation-delay: 6s;
+}
+#text5 {
+animation-delay: 8s;
+}
+
+@keyframes fadeIn {
+from {
+opacity: 0;
+transform: translateY(20px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.loading {
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+font-size: 1rem;
+color: black;
+}
+
+.music-button {
+color: white;
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+background: rgba(0, 0, 0, 0.5);
+border: none;
+padding: 15px 20px;
+border-radius: 5px;
+cursor: pointer;
+display: none;
+font-size: 1rem;
+}
+
+.progress-container {
+position: fixed;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+width: 80%;
+height: 10px;
+background: #ccc;
+border-radius: 5px;
+overflow: hidden;
+}
+
+.progress-bar {
+height: 100%;
+width: 0%;
+background: black;
+transition: width 0.3s;
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+MENGUNDUH KONTEN...
+</div>
+
+<div class="progress-container">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+
+<video class="video-background" autoplay muted loop id="video">
+<source src="https://raw.githubusercontent.com/whquote/me/main/one.mp4" type="video/mp4" />
+</video>
+
+<div class="overlay" id="overlay">
+<p class="text" id="text1">
+Hanya pengisi waktu luang,<br/>Bukan sebagai pemenang,<br/><br/>- INGAT -<br/>Dia hanya ingin ditemani,<br/>Bukan dimiliki.
+</p>
+<p class="text" id="text2">
+<br/><br/>
+<b>05/05/2025</b>
+</p>
+</div>
+
+<audio id="audio" loop>
+<source src="https://raw.githubusercontent.com/whquote/me/main/one.mp3" type="audio/mp3" />
+</audio>
+
+<button class="music-button" id="musicButton">KLIK DI SINI</button>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+const video = document.getElementById("video");
+const overlay = document.getElementById("overlay");
+const loading = document.getElementById("loading");
+const musicButton = document.getElementById("musicButton");
+const audio = document.getElementById("audio");
+const progressBar = document.getElementById("progressBar");
+
+const files = [
+"https://raw.githubusercontent.com/whquote/me/main/one.mp4",
+"https://raw.githubusercontent.com/whquote/me/main/one.mp3"
+];
+
+let downloadedFiles = 0;
+
+const checkFileAvailability = (fileUrl) => {
+return new Promise((resolve) => {
+fetch(fileUrl)
+.then(response => {
+resolve(response.ok);
+})
+.catch(() => resolve(false));
+});
+};
+
+const checkAllFiles = async () => {
+for (let i = 0; i < files.length; i++) {
+const success = await checkFileAvailability(files[i]);
+downloadedFiles++;
+const percent = Math.round((downloadedFiles / files.length) * 100);
+loading.innerText = `MENGUNDUH KONTEN... (${downloadedFiles}/${files.length})`;
+progressBar.style.width = `${percent}%`;
+
+if (!success) {
+alert(`Gagal memuat file:\n${files[i]}\nPeriksa koneksi atau URL.`);
+return;
+}
+}
+showPlayButton();
+};
+
+const showPlayButton = () => {
+loading.style.display = "none";
+document.querySelector('.progress-container').style.display = "none";
+musicButton.style.display = "block";
+};
+
+const startPage = () => {
+musicButton.style.display = "none";
+video.style.display = "block";
+overlay.style.display = "flex";
+};
+
+musicButton.addEventListener("click", () => {
+audio.play().then(() => {
+startPage();
+}).catch(error => {
+console.log("Interaksi pengguna diperlukan untuk memutar audio:", error);
+});
+});
+
+checkAllFiles();
+});
+</script>
+
+</body>
+</html>
